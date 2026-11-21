@@ -91,10 +91,20 @@ export default function PriceChart({ symbol }) {
   const [data, setData] = useState([]);
   const [range, setRange] = useState("1M");
 
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
   useEffect(() => {
+    setLoading(true);
+    setError(null);
     const days = RANGES.find((r) => r.label === range)?.days || 30;
     fetchChartData(symbol, days)
-      .then((bars) =>
+      .then((bars) => {
+        if (!Array.isArray(bars)) {
+          setError(bars?.error || "Failed to load chart data");
+          setData([]);
+          return;
+        }
         setData(
           bars.map((b) => ({
             date: new Date(b.timestamp).toLocaleDateString("en-US", { month: "short", day: "numeric" }),
@@ -104,9 +114,13 @@ export default function PriceChart({ symbol }) {
             low: b.low,
             volume: b.volume,
           }))
-        )
-      )
-      .catch(() => {});
+        );
+      })
+      .catch((err) => {
+        setError("Unable to connect to server");
+        setData([]);
+      })
+      .finally(() => setLoading(false));
   }, [symbol, range]);
 
   const latest = data.length > 0 ? data[data.length - 1] : null;
@@ -146,7 +160,18 @@ export default function PriceChart({ symbol }) {
         </div>
       </div>
       <div style={{ padding: "8px 8px 16px" }}>
-        <ResponsiveContainer width="100%" height={340}>
+        {loading && data.length === 0 && (
+          <div style={{ height: 340, display: "flex", alignItems: "center", justifyContent: "center", color: "var(--text-muted)", fontSize: "0.85rem" }}>
+            Loading chart data…
+          </div>
+        )}
+        {error && (
+          <div style={{ height: 340, display: "flex", alignItems: "center", justifyContent: "center", color: "#ef4444", fontSize: "0.85rem", flexDirection: "column", gap: 8 }}>
+            <span>{error}</span>
+            <span style={{ color: "var(--text-muted)", fontSize: "0.75rem" }}>Make sure the backend server is running</span>
+          </div>
+        )}
+        {!error && data.length > 0 && <ResponsiveContainer width="100%" height={340}>
           <ComposedChart data={data}>
             <defs>
               <linearGradient id={gradId} x1="0" y1="0" x2="0" y2="1">
@@ -221,7 +246,7 @@ export default function PriceChart({ symbol }) {
               }}
             />
           </ComposedChart>
-        </ResponsiveContainer>
+        </ResponsiveContainer>}
       </div>
     </>
   );

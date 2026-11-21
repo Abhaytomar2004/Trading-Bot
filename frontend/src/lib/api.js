@@ -14,6 +14,7 @@ export async function fetchChartData(symbol, limit = 50) {
   const res = await fetch(
     `${API_BASE}/api/chart-data?symbol=${symbol}&limit=${limit}`
   );
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
   return res.json();
 }
 
