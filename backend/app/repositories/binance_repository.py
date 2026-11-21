@@ -7,7 +7,7 @@ import httpx
 
 from app.config import settings
 
-BINANCE_PUBLIC = "https://api.binance.com"
+BINANCE_PUBLIC = "https://data-api.binance.vision"
 BINANCE_TESTNET = "https://testnet.binance.vision"
 
 
