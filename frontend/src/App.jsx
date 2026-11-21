@@ -8,15 +8,33 @@ import TradeLogPage from "./pages/TradeLogPage";
 import AnalyticsPage from "./pages/AnalyticsPage";
 import { fetchPositions, fetchEquity, fetchStatus, fetchTrades } from "./lib/api";
 
-const SYMBOLS = ["AAPL", "MSFT", "GOOGL", "AMZN", "TSLA"];
+const US_SYMBOLS = ["AAPL", "MSFT", "GOOGL", "AMZN", "TSLA"];
+const IN_SYMBOLS = ["RELIANCE", "TCS", "INFY", "WIPRO", "HCLTECH"];
+const CRYPTO_SYMBOLS = ["BTCUSDT", "ETHUSDT", "SOLUSDT", "BNBUSDT", "XRPUSDT"];
+
+const DEFAULT_SYMBOL = { US: "AAPL", IN: "RELIANCE", CRYPTO: "BTCUSDT" };
 
 export default function App() {
+  const [market, setMarket] = useState("US");
   const [activeSymbol, setActiveSymbol] = useState("AAPL");
   const [positions, setPositions] = useState({});
   const [equity, setEquity] = useState([]);
   const [status, setStatus] = useState({});
   const [trades, setTrades] = useState([]);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [customSymbols, setCustomSymbols] = useState({ IN: [], CRYPTO: [] });
+
+  const getSymbols = () => {
+    if (market === "US") return US_SYMBOLS;
+    if (market === "IN") return [...IN_SYMBOLS, ...customSymbols.IN.filter((s) => !IN_SYMBOLS.includes(s))];
+    return [...CRYPTO_SYMBOLS, ...customSymbols.CRYPTO.filter((s) => !CRYPTO_SYMBOLS.includes(s))];
+  };
+
+  const getDefaults = () => {
+    if (market === "US") return US_SYMBOLS;
+    if (market === "IN") return IN_SYMBOLS;
+    return CRYPTO_SYMBOLS;
+  };
 
   function refreshData() {
     fetchPositions().then(setPositions).catch(() => {});
@@ -27,6 +45,28 @@ export default function App() {
 
   useEffect(() => { refreshData(); }, []);
 
+  function handleMarketChange(m) {
+    setMarket(m);
+    setActiveSymbol(DEFAULT_SYMBOL[m]);
+  }
+
+  function handleAddSymbol(sym) {
+    if (market === "US") return;
+    const defaults = getDefaults();
+    if (!customSymbols[market].includes(sym) && !defaults.includes(sym)) {
+      setCustomSymbols((prev) => ({ ...prev, [market]: [...prev[market], sym] }));
+    }
+    setActiveSymbol(sym);
+  }
+
+  function handleRemoveSymbol(sym) {
+    if (market === "US") return;
+    const defaults = getDefaults();
+    if (defaults.includes(sym)) return;
+    setCustomSymbols((prev) => ({ ...prev, [market]: prev[market].filter((s) => s !== sym) }));
+    if (activeSymbol === sym) setActiveSymbol(getDefaults()[0]);
+  }
+
   const latestEquity = equity.length > 0 ? equity[0].total_equity : 100000;
   const pnl = latestEquity - 100000;
   const pnlPct = ((pnl / 100000) * 100).toFixed(2);
@@ -34,14 +74,19 @@ export default function App() {
   return (
     <BrowserRouter>
       <div className="app">
-        <TopBar status={status} onMenuToggle={() => setSidebarOpen(!sidebarOpen)} />
+        <TopBar status={status} market={market} onMenuToggle={() => setSidebarOpen(!sidebarOpen)} />
         <div className={`sidebar-overlay ${sidebarOpen ? "open" : ""}`} onClick={() => setSidebarOpen(false)} />
         <Sidebar
-          symbols={SYMBOLS}
+          symbols={getSymbols()}
           activeSymbol={activeSymbol}
           onSymbolChange={(sym) => { setActiveSymbol(sym); setSidebarOpen(false); }}
           positions={positions}
           isOpen={sidebarOpen}
+          market={market}
+          onMarketChange={handleMarketChange}
+          onAddSymbol={handleAddSymbol}
+          onRemoveSymbol={handleRemoveSymbol}
+          defaultSymbols={getDefaults()}
         />
         <main className="main">
           <Routes>
@@ -57,6 +102,7 @@ export default function App() {
                   pnl={pnl}
                   pnlPct={pnlPct}
                   onRefresh={refreshData}
+                  market={market}
                 />
               }
             />

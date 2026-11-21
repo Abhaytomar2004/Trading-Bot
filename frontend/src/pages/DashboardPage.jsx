@@ -8,7 +8,7 @@ import EquityChart from "../components/EquityChart";
 import TradePanel from "../components/TradePanel";
 import BotCycleButton from "../components/BotCycleButton";
 
-export default function DashboardPage({ activeSymbol, positions, equity, status, latestEquity, pnl, pnlPct, onRefresh }) {
+export default function DashboardPage({ activeSymbol, positions, equity, status, latestEquity, pnl, pnlPct, onRefresh, market }) {
   return (
     <>
       <StatsRow
@@ -20,7 +20,7 @@ export default function DashboardPage({ activeSymbol, positions, equity, status,
       />
       <div className="chart-section">
         <div className="card">
-          <PriceChart symbol={activeSymbol} />
+          <PriceChart symbol={activeSymbol} market={market} />
         </div>
         <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
           <TradePanel positions={positions} onTradeComplete={onRefresh} />
@@ -28,7 +28,7 @@ export default function DashboardPage({ activeSymbol, positions, equity, status,
             <div className="card-header">
               <span className="card-title">Market Details</span>
             </div>
-            <MarketInfo symbol={activeSymbol} />
+            <MarketInfo symbol={activeSymbol} market={market} />
           </div>
         </div>
       </div>

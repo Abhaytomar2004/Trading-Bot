@@ -24,6 +24,13 @@ class Settings:
     MAX_OPEN_POSITIONS: int = int(os.getenv("MAX_OPEN_POSITIONS", "5"))
     STARTING_CAPITAL: float = float(os.getenv("STARTING_CAPITAL", "100000"))
 
+    BINANCE_API_KEY: str = os.getenv("BINANCE_API_KEY", "").strip()
+    BINANCE_SECRET_KEY: str = os.getenv("BINANCE_SECRET_KEY", "").strip()
+
+    WATCHLIST_CRYPTO: list[str] = os.getenv("WATCHLIST_CRYPTO", "BTCUSDT,ETHUSDT,SOLUSDT,BNBUSDT,XRPUSDT").split(",")
+
+    WATCHLIST_IN: list[str] = os.getenv("WATCHLIST_IN", "RELIANCE,TCS,INFY,WIPRO,HCLTECH").split(",")
+
     FRONTEND_URL: str = os.getenv("FRONTEND_URL", "*").strip()
 
 

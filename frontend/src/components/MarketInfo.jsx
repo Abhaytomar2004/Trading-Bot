@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from "react";
-import { fetchChartData } from "../lib/api";
+import { fetchChartData, fetchINChartData, fetchCryptoChartData } from "../lib/api";
 
-export default function MarketInfo({ symbol }) {
+export default function MarketInfo({ symbol, market = "US" }) {
+  const currency = market === "CRYPTO" ? "$" : market === "IN" ? "₹" : "$";
   const [info, setInfo] = useState(null);
 
   useEffect(() => {
-    fetchChartData(symbol, 20).then((bars) => {
-      if (bars.length < 2) return;
+    const fetcher = market === "US" ? fetchChartData : market === "IN" ? fetchINChartData : fetchCryptoChartData;
+    fetcher(symbol, 20).then((bars) => {
+      if (!Array.isArray(bars) || bars.length < 2) return;
       const latest = bars[bars.length - 1];
       const prev = bars[bars.length - 2];
       const closes = bars.map((b) => b.close);
@@ -39,23 +41,23 @@ export default function MarketInfo({ symbol }) {
         volRatio: latest.volume / avgVol,
       });
     }).catch(() => {});
-  }, [symbol]);
+  }, [symbol, market]);
 
   if (!info) return <div className="card-body" style={{ color: "var(--text-muted)" }}>Loading...</div>;
 
   const items = [
-    ["Open", `$${info.open.toFixed(2)}`],
-    ["Prev Close", `$${info.prevClose.toFixed(2)}`],
-    ["Day High", `$${info.high.toFixed(2)}`],
-    ["Day Low", `$${info.low.toFixed(2)}`],
+    ["Open", `${currency}${info.open.toFixed(2)}`],
+    ["Prev Close", `${currency}${info.prevClose.toFixed(2)}`],
+    ["Day High", `${currency}${info.high.toFixed(2)}`],
+    ["Day Low", `${currency}${info.low.toFixed(2)}`],
     ["Volume", info.volume.toLocaleString()],
     ["Avg Volume", info.avgVol.toLocaleString()],
-    ["20D High", `$${info.high20.toFixed(2)}`],
-    ["20D Low", `$${info.low20.toFixed(2)}`],
-    ["SMA(10)", `$${info.sma10.toFixed(2)}`],
+    ["20D High", `${currency}${info.high20.toFixed(2)}`],
+    ["20D Low", `${currency}${info.low20.toFixed(2)}`],
+    ["SMA(10)", `${currency}${info.sma10.toFixed(2)}`],
     ["RSI(14)", info.rsi.toFixed(1)],
     ["Vol Ratio", `${info.volRatio.toFixed(2)}x`],
-    ["Spread", `$${(info.high - info.low).toFixed(2)}`],
+    ["Spread", `${currency}${(info.high - info.low).toFixed(2)}`],
   ];
 
   const rsiColor = info.rsi > 70 ? "var(--accent-red)" : info.rsi < 30 ? "var(--accent-green)" : "var(--text-secondary)";

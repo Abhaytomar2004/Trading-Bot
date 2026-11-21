@@ -1,11 +1,14 @@
 import traceback
 
 from fastapi import APIRouter, Query
+from pydantic import BaseModel
 
 from app.models.schemas import ManualOrderRequest, AnalyzeRequest
 from app.services.trading_service import trading_service
+from app.repositories.binance_repository import binance_repo
 
 router = APIRouter(prefix="/api")
+
 
 
 @router.post("/run-cycle")
@@ -28,5 +31,20 @@ def manual_trade(order: ManualOrderRequest):
 def analyze(req: AnalyzeRequest):
     try:
         return trading_service.analyze(req.symbol)
+    except Exception as e:
+        return {"error": str(e)}
+
+
+class CryptoOrderRequest(BaseModel):
+    symbol: str
+    side: str
+    qty: float
+
+
+@router.post("/crypto/trade")
+def crypto_trade(order: CryptoOrderRequest):
+    try:
+        result = binance_repo.place_order(order.symbol, order.side, order.qty)
+        return result
     except Exception as e:
         return {"error": str(e)}

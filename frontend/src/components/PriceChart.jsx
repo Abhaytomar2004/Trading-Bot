@@ -11,7 +11,7 @@ import {
   ReferenceLine,
   ReferenceDot,
 } from "recharts";
-import { fetchChartData } from "../lib/api";
+import { fetchChartData, fetchINChartData, fetchCryptoChartData } from "../lib/api";
 
 const RANGES = [
   { label: "1W", days: 7 },
@@ -32,7 +32,7 @@ function CustomDot({ cx, cy, index, dataLength, color }) {
   );
 }
 
-function CustomTooltip({ active, payload, label }) {
+function CustomTooltip({ active, payload, label, currency = "$" }) {
   if (!active || !payload || !payload.length) return null;
   const d = payload[0]?.payload;
   if (!d) return null;
@@ -51,13 +51,13 @@ function CustomTooltip({ active, payload, label }) {
       <div style={{ color: "#94a3b8", marginBottom: 6, fontWeight: 500 }}>{label}</div>
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "3px 16px" }}>
         <span style={{ color: "#64748b" }}>Open</span>
-        <span style={{ color: "#f1f5f9", fontFamily: "'JetBrains Mono', monospace", textAlign: "right" }}>${d.open.toFixed(2)}</span>
+        <span style={{ color: "#f1f5f9", fontFamily: "'JetBrains Mono', monospace", textAlign: "right" }}>{currency}{d.open.toFixed(2)}</span>
         <span style={{ color: "#64748b" }}>High</span>
-        <span style={{ color: "#10b981", fontFamily: "'JetBrains Mono', monospace", textAlign: "right" }}>${d.high.toFixed(2)}</span>
+        <span style={{ color: "#10b981", fontFamily: "'JetBrains Mono', monospace", textAlign: "right" }}>{currency}{d.high.toFixed(2)}</span>
         <span style={{ color: "#64748b" }}>Low</span>
-        <span style={{ color: "#ef4444", fontFamily: "'JetBrains Mono', monospace", textAlign: "right" }}>${d.low.toFixed(2)}</span>
+        <span style={{ color: "#ef4444", fontFamily: "'JetBrains Mono', monospace", textAlign: "right" }}>{currency}{d.low.toFixed(2)}</span>
         <span style={{ color: "#64748b" }}>Close</span>
-        <span style={{ color: "#f1f5f9", fontFamily: "'JetBrains Mono', monospace", fontWeight: 600, textAlign: "right" }}>${d.close.toFixed(2)}</span>
+        <span style={{ color: "#f1f5f9", fontFamily: "'JetBrains Mono', monospace", fontWeight: 600, textAlign: "right" }}>{currency}{d.close.toFixed(2)}</span>
       </div>
       <div style={{
         marginTop: 6,
@@ -87,7 +87,8 @@ function CustomTooltip({ active, payload, label }) {
   );
 }
 
-export default function PriceChart({ symbol }) {
+export default function PriceChart({ symbol, market = "US" }) {
+  const currency = market === "US" ? "$" : "₹";
   const [data, setData] = useState([]);
   const [range, setRange] = useState("1M");
 
@@ -98,7 +99,8 @@ export default function PriceChart({ symbol }) {
     setLoading(true);
     setError(null);
     const days = RANGES.find((r) => r.label === range)?.days || 30;
-    fetchChartData(symbol, days)
+    const fetcher = market === "US" ? fetchChartData : market === "IN" ? fetchINChartData : fetchCryptoChartData;
+    fetcher(symbol, days)
       .then((bars) => {
         if (!Array.isArray(bars)) {
           setError(bars?.error || "Failed to load chart data");
@@ -107,7 +109,7 @@ export default function PriceChart({ symbol }) {
         }
         setData(
           bars.map((b) => ({
-            date: new Date(b.timestamp).toLocaleDateString("en-US", { month: "short", day: "numeric" }),
+            date: new Date(typeof b.timestamp === "number" && b.timestamp > 1e12 ? b.timestamp : b.timestamp).toLocaleDateString("en-US", { month: "short", day: "numeric" }),
             close: b.close,
             open: b.open,
             high: b.high,
@@ -133,10 +135,10 @@ export default function PriceChart({ symbol }) {
   return (
     <>
       <div className="symbol-header">
-        <span className="sym">{symbol}</span>
+        <span className="sym">{market === "CRYPTO" ? symbol.replace("USDT", "") : symbol}</span>
         {latest && (
           <>
-            <span className="price-big">${latest.close.toFixed(2)}</span>
+            <span className="price-big">{currency}{latest.close.toFixed(2)}</span>
             <span className={`change-badge ${change >= 0 ? "up" : "down"}`}>
               {change >= 0 ? "+" : ""}{change.toFixed(2)} ({changePct}%)
             </span>
@@ -201,11 +203,11 @@ export default function PriceChart({ symbol }) {
               tick={{ fill: "#64748b", fontSize: 11 }}
               axisLine={false}
               tickLine={false}
-              tickFormatter={(v) => `$${v}`}
+              tickFormatter={(v) => `${currency}${v}`}
               width={70}
             />
             <YAxis yAxisId="vol" orientation="right" hide />
-            <Tooltip content={<CustomTooltip />} cursor={{ stroke: "#3b82f6", strokeWidth: 1, strokeDasharray: "4 4" }} />
+            <Tooltip content={<CustomTooltip currency={currency} />} cursor={{ stroke: "#3b82f6", strokeWidth: 1, strokeDasharray: "4 4" }} />
             <Bar yAxisId="vol" dataKey="volume" fill="#1e293b" radius={[2, 2, 0, 0]} />
             {first && (
               <ReferenceLine
@@ -215,7 +217,7 @@ export default function PriceChart({ symbol }) {
                 strokeDasharray="4 4"
                 strokeWidth={1}
                 label={{
-                  value: `$${first.close.toFixed(2)}`,
+                  value: `${currency}${first.close.toFixed(2)}`,
                   position: "right",
                   fill: "#475569",
                   fontSize: 10,
