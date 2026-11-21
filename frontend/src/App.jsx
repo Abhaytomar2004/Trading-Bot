@@ -16,6 +16,7 @@ export default function App() {
   const [equity, setEquity] = useState([]);
   const [status, setStatus] = useState({});
   const [trades, setTrades] = useState([]);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   function refreshData() {
     fetchPositions().then(setPositions).catch(() => {});
@@ -33,12 +34,14 @@ export default function App() {
   return (
     <BrowserRouter>
       <div className="app">
-        <TopBar status={status} />
+        <TopBar status={status} onMenuToggle={() => setSidebarOpen(!sidebarOpen)} />
+        <div className={`sidebar-overlay ${sidebarOpen ? "open" : ""}`} onClick={() => setSidebarOpen(false)} />
         <Sidebar
           symbols={SYMBOLS}
           activeSymbol={activeSymbol}
-          onSymbolChange={setActiveSymbol}
+          onSymbolChange={(sym) => { setActiveSymbol(sym); setSidebarOpen(false); }}
           positions={positions}
+          isOpen={sidebarOpen}
         />
         <main className="main">
           <Routes>

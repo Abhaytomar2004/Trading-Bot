@@ -30,7 +30,7 @@ export default function PositionsPage({ positions, latestEquity }) {
         <p className="page-subtitle">Detailed view of all open holdings</p>
       </div>
 
-      <div className="stats-row" style={{ gridTemplateColumns: "repeat(4, 1fr)" }}>
+      <div className="stats-row">
         <div className="stat-card">
           <div className="label">Invested Value</div>
           <div className="value">${totalInvested.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
@@ -60,7 +60,7 @@ export default function PositionsPage({ positions, latestEquity }) {
         </div>
       ) : (
         <div className="card">
-          <div className="card-body-flush">
+          <div className="card-body-flush table-scroll">
             <table>
               <thead>
                 <tr>

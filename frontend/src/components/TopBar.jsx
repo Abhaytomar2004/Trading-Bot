@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 
-export default function TopBar({ status }) {
+export default function TopBar({ status, onMenuToggle }) {
   const [time, setTime] = useState(new Date());
 
   useEffect(() => {
@@ -22,6 +22,7 @@ export default function TopBar({ status }) {
   return (
     <div className="topbar">
       <div className="topbar-left">
+        <button className="menu-toggle" onClick={onMenuToggle}>☰</button>
         <span className="logo">DhanBot</span>
         <span className="logo-dot"></span>
         <span className="badge badge-paper">PAPER</span>
@@ -30,7 +31,7 @@ export default function TopBar({ status }) {
         </span>
       </div>
       <div className="topbar-right">
-        <span style={{ color: "var(--text-muted)", fontSize: "0.75rem" }}>
+        <span className="last-cycle-text" style={{ color: "var(--text-muted)", fontSize: "0.75rem" }}>
           Last cycle: {status.last_run ? new Date(status.last_run).toLocaleString() : "Never"}
         </span>
         <span className="clock">ET {fmt}</span>

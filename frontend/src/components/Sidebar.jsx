@@ -9,7 +9,7 @@ const NAV_ITEMS = [
   { path: "/analytics", label: "Analytics", icon: "◆" },
 ];
 
-export default function Sidebar({ symbols, activeSymbol, onSymbolChange, positions }) {
+export default function Sidebar({ symbols, activeSymbol, onSymbolChange, positions, isOpen }) {
   const [prices, setPrices] = useState({});
   const location = useLocation();
   const navigate = useNavigate();
@@ -29,7 +29,7 @@ export default function Sidebar({ symbols, activeSymbol, onSymbolChange, positio
   }, [symbols]);
 
   return (
-    <div className="sidebar">
+    <div className={`sidebar ${isOpen ? "open" : ""}`}>
       <div className="sidebar-section">
         <div className="sidebar-title">Navigation</div>
         {NAV_ITEMS.map((item) => (

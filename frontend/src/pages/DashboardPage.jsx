@@ -52,7 +52,7 @@ export default function DashboardPage({ activeSymbol, positions, equity, status,
               {Object.keys(positions).length} active
             </span>
           </div>
-          <div className="card-body-flush">
+          <div className="card-body-flush table-scroll">
             <PositionsTable positions={positions} />
           </div>
         </div>
@@ -60,7 +60,7 @@ export default function DashboardPage({ activeSymbol, positions, equity, status,
           <div className="card-header">
             <span className="card-title">Recent Trades</span>
           </div>
-          <div className="card-body-flush">
+          <div className="card-body-flush table-scroll">
             <TradeHistory />
           </div>
         </div>

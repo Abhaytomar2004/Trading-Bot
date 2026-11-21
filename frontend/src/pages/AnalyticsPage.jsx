@@ -89,7 +89,7 @@ export default function AnalyticsPage({ trades, equity, positions }) {
         <p className="page-subtitle">Performance metrics and insights</p>
       </div>
 
-      <div className="stats-row" style={{ gridTemplateColumns: "repeat(4, 1fr)" }}>
+      <div className="stats-row">
         <div className="stat-card">
           <div className="label">Total Trades</div>
           <div className="value">{stats.totalTrades}</div>
@@ -240,7 +240,7 @@ export default function AnalyticsPage({ trades, equity, positions }) {
         <div className="card-header">
           <span className="card-title">Symbol Breakdown</span>
         </div>
-        <div className="card-body-flush">
+        <div className="card-body-flush table-scroll">
           <table>
             <thead>
               <tr>

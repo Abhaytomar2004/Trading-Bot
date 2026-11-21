@@ -51,7 +51,7 @@ export default function TradeLogPage({ trades }) {
         <p className="page-subtitle">Complete history of all executed trades</p>
       </div>
 
-      <div className="stats-row" style={{ gridTemplateColumns: "repeat(4, 1fr)" }}>
+      <div className="stats-row">
         <div className="stat-card">
           <div className="label">Total Trades</div>
           <div className="value">{trades.length}</div>
@@ -117,7 +117,7 @@ export default function TradeLogPage({ trades }) {
             <p>{trades.length === 0 ? "No trades yet — waiting for first cycle" : "No trades match filters"}</p>
           </div>
         ) : (
-          <div className="card-body-flush">
+          <div className="card-body-flush table-scroll">
             <table>
               <thead>
                 <tr>

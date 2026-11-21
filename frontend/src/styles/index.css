@@ -551,27 +551,171 @@ td .mono {
   color: var(--text-muted);
 }
 
+/* Mobile Menu Toggle */
+.menu-toggle {
+  display: none;
+  background: none;
+  border: none;
+  color: var(--text-primary);
+  font-size: 1.4rem;
+  cursor: pointer;
+  padding: 4px;
+  line-height: 1;
+}
+
+/* Sidebar Overlay */
+.sidebar-overlay {
+  display: none;
+}
+
+/* Table scroll wrapper */
+.table-scroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
 /* Responsive */
 @media (max-width: 1024px) {
   .app {
     grid-template-columns: 1fr;
   }
+
+  .menu-toggle {
+    display: block;
+  }
+
   .sidebar {
     display: none;
+    position: fixed;
+    top: 56px;
+    left: 0;
+    bottom: 0;
+    width: 280px;
+    z-index: 100;
+    background: var(--bg-secondary);
+    border-right: 1px solid var(--border);
+    overflow-y: auto;
   }
+
+  .sidebar.open {
+    display: block;
+  }
+
+  .sidebar-overlay {
+    display: none;
+    position: fixed;
+    top: 56px;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 99;
+  }
+
+  .sidebar-overlay.open {
+    display: block;
+  }
+
   .chart-section {
     grid-template-columns: 1fr;
   }
+
   .stats-row {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(2, 1fr) !important;
   }
+
   .bottom-section {
     grid-template-columns: 1fr;
+  }
+
+  .main {
+    padding: 16px;
+  }
+
+  .topbar {
+    padding: 0 16px;
+  }
+
+  .topbar-right .last-cycle-text {
+    display: none;
   }
 }
 
 @media (max-width: 640px) {
   .stats-row {
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr !important;
+    gap: 10px;
+  }
+
+  .stat-card {
+    padding: 12px 16px;
+  }
+
+  .stat-card .value {
+    font-size: 1.2rem;
+  }
+
+  .main {
+    padding: 12px;
+  }
+
+  .topbar {
+    padding: 0 12px;
+  }
+
+  .topbar-right .clock {
+    display: none;
+  }
+
+  .symbol-header {
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 12px 16px 0;
+  }
+
+  .symbol-header .price-big {
+    font-size: 1.2rem;
+  }
+
+  .card-header {
+    padding: 12px 16px;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .card-body {
+    padding: 12px 16px;
+  }
+
+  .page-title {
+    font-size: 1.15rem;
+  }
+
+  thead th,
+  tbody td {
+    padding: 8px 10px;
+    font-size: 0.75rem;
+    white-space: nowrap;
+  }
+
+  .chart-toolbar {
+    gap: 2px;
+  }
+
+  .chart-toolbar button {
+    padding: 4px 8px;
+    font-size: 0.65rem;
+  }
+
+  .mini-stats {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .mini-stat {
+    padding: 8px 12px;
+  }
+
+  .mini-stat .ms-value {
+    font-size: 0.82rem;
   }
 }
